@@ -1,0 +1,30 @@
+{
+  "name": "ngLog",
+  "version": "0.0.1",
+  "dependencies": {
+    "angular": "~1.2.27"
+  },
+  "devDependencies": {
+    "angular-mocks": "~1.2.27"
+  },
+  "resolutions": {
+    "angular": "~1.2.27"
+  },
+  "description": "AngularJS module for smart logging and debugging",
+  "main": "ngLog.js",
+  "keywords": [
+    "angular",
+    "angularjs",
+    "js",
+    "log",
+    "logger"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

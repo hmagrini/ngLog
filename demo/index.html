@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <title></title>
+
+</head>
+<body ng-app="demoApp">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.1/css/foundation.min.css">
+<style type="text/css">
+  @import url(//fonts.googleapis.com/css?family=Roboto:400,500,300,100,700,900);
+  html, body {
+    background: #FAFAFA; }
+
+  .card {
+    font-family: 'Roboto', sans-serif;
+    overflow: hidden;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    color: #272727;
+    border-radius: 2px; }
+  .card .title {
+    line-height: 3rem;
+    font-size: 1.5rem;
+    font-weight: 300; }
+  .card .content {
+    padding: 1.3rem;
+    font-weight: 300;
+    border-radius: 0 0 2px 2px; }
+  .card p {
+    margin: 0; }
+</style>
+
+<div class="row" ng-controller="demoController">
+  <div class="small-12 columns">
+    <div class="card">
+      <div class="content">
+        <span class="title">NGLogger Demo</span>
+        <p>
+          Open the developer console in order to check the example
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+<script type="application/javascript" src="js/ngLog/ngLog.js"></script>
+<script type="application/javascript" src="js/demo.js"></script>
+
+</body>
+</html>
