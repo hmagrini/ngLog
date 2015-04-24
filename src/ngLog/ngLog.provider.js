@@ -1,15 +1,12 @@
 (function () {
   "use strict";
   angular
-      .module('ngLogModule')
-      .provider('ngLog', NgLog);
+    .module('ngLogModule')
+    .provider('ngLog', NgLog);
 
   function NgLog() {
     // Just in case IE behaves like...well, IE
     var self = this;
-
-    // We'll use this object to save the logger tree references
-    self.loggers = {};
 
     // Options that will affect all loggers
     self.globalOptions = {
@@ -57,19 +54,19 @@
         filterLogging   : filterLogging,
         muteLoggingBut  : muteLoggingBut,
         showHistory     : showHistory,
-        debug: function () {
+        debug: function debugFn() {
           this._log(Levels.DEBUG.toString(), arguments);
         },
-        error: function () {
+        error: function errorFn() {
           this._log(Levels.ERROR.toString(), arguments);
         },
-        info: function () {
+        info: function infoFn() {
           this._log(Levels.INFO.toString(), arguments);
         },
-        log: function () {
+        log: function logFn() {
           this._log(Levels.LOG.toString(), arguments);
         },
-        warn: function () {
+        warn: function warnFn() {
           this._log(Levels.WARN.toString(), arguments);
         }
       };
@@ -83,26 +80,26 @@
        * @returns {Object} Logger instance
        */
       function get(context, isolate) {
+        var parent = this.$root;
+        var hierarchyTree = [];
 
-        var hierarchyTree = context.split('.');
-        var parent;
-
-        // We need to find the root of the hierarchy tree, if there is none, we'll create it
-        if(!self.loggers[hierarchyTree[0]]){
-          self.loggers[hierarchyTree[0]] = createLoggerInstance.call(this, context, isolate);
+        // If the current context is different than the root, then we will union the current context and the one passed
+        // in order to correctly identify the hierarchy tree
+        if(this.context !== 'root'){
+          hierarchyTree = _.union(this.context.split('.'), context.split('.'));
+          context = hierarchyTree.join('.');
+        }else{
+          hierarchyTree = context.split('.');
         }
-        // And we'll get a hold of the root
-        parent = self.loggers[hierarchyTree[0]];
 
         // We're going to navigate through the rest of the tree, and return when we found an instance of the requested
         // Logger. If along the tree, there is a branch that doesn't exist, it will be created automatically
-        hierarchyTree = hierarchyTree.slice(1);
-        for (var i = 0; i < hierarchyTree.length; i++) {
-          if (typeof parent[hierarchyTree[i]] === "undefined") {
-            parent[hierarchyTree[i]] = createLoggerInstance.call(this, context, isolate, parent);
+        _.each(hierarchyTree, function (child) {
+          if(_.isUndefined(parent[child])){
+            parent[child] = createLoggerInstance.call(parent.$root, context, isolate, parent);
           }
-          parent = parent[hierarchyTree[i]];
-        }
+          parent = parent[child];
+        });
 
         return parent;
       }
@@ -158,10 +155,11 @@
         }
 
         var toLogArray = getFormattedContext.call(this);
+
         // We'll append the args that the Logger should log to the entire message
-        for (var i = 0; i < args.length; i++) {
-          toLogArray.push(args[i]);
-        }
+        _.each(args, function(arg){
+          toLogArray.push(arg);
+        });
 
         // Prevent logging when console is not available
         if (window.console) {
