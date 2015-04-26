@@ -30,7 +30,7 @@
 ```
 * Step 3: create a new instance of the logger with the desired context name
 ```javascript
-  var firstLogger = ngLog.$new('firstLogger');
+  var firstLogger = ngLog.get('firstLogger');
   firstLogger.log('Log example'); // Will output: 'Log example'
 ```
 
