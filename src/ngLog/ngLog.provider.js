@@ -217,7 +217,7 @@
         var mute = logger.options;
 
         if (mute.filterFrom !== null){
-          consolable = !(Levels[originalFn.toUpperCase()].isLessThan(mute.filterFrom));
+          consolable = !(Levels[originalFn.toUpperCase()].isLowerThan(mute.filterFrom));
         }
 
         if (mute.muteExcept !== null){

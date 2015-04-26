@@ -10,19 +10,20 @@
       isEqualTo               : isEqualTo,
       isGreaterThan           : isGreaterThan,
       isGreaterThanOrEqualTo  : isGreaterThanOrEqualTo,
-      isLessThan              : isLessThan,
-      isLessThanOrEqualTo     : isLessThanOrEqualTo,
+      isLowerThan             : isLowerThan,
+      isLowerThanOrEqualTo    : isLowerThanOrEqualTo,
+      toLevel                 : toLevel,
       toString                : toString
     };
 
     var ngLogLevel = {
-      VERBOSE : new Level(Number.MIN_VALUE, "VERBOSE"),
+      VERBOSE : new Level(Number.MIN_VALUE, "verbose"),
       LOG     : new Level(5000, "log"),
       DEBUG   : new Level(10000, "debug"),
       INFO    : new Level(20000, "info"),
       WARN    : new Level(30000, "warn"),
       ERROR   : new Level(40000, "error"),
-      SILENT  : new Level(Number.MAX_VALUE, "SILENT")
+      SILENT  : new Level(Number.MAX_VALUE, "silent")
     };
 
     return ngLogLevel;
@@ -36,19 +37,19 @@
       return this.level === toLevel(otherLevel).level;
     }
 
-    function isLessThan(otherLevel) {
-      return this.level < toLevel(otherLevel).level;
-    }
-
     function isGreaterThan(otherLevel) {
-      return this.level < toLevel(otherLevel).level;
+      return this.level > toLevel(otherLevel).level;
     }
 
     function isGreaterThanOrEqualTo(otherLevel) {
       return this.level >= toLevel(otherLevel).level;
     }
 
-    function isLessThanOrEqualTo(otherLevel) {
+    function isLowerThan(otherLevel) {
+      return this.level < toLevel(otherLevel).level;
+    }
+
+    function isLowerThanOrEqualTo(otherLevel) {
       return this.level <= toLevel(otherLevel).level;
     }
 
