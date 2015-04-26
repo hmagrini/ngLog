@@ -18,8 +18,8 @@ module.exports = function(options) {
     var bowerDeps = wiredep(wiredepOptions);
 
     var specFiles = [
-      options.src + '/**/*.spec.js',
-      options.src + '/**/*.mock.js'
+      options.spec + '/**/**.spec.js',
+      options.spec + '/**/**.mock.js'
     ];
 
     var htmlFiles = [
@@ -27,7 +27,8 @@ module.exports = function(options) {
     ];
 
     var srcFiles = [
-      options.src + '/app/**/*.js'
+      options.src + '/ngLog/ngLog.js',
+      options.src + '/ngLog/*.*.js'
     ].concat(specFiles.map(function(file) {
       return '!' + file;
     }));

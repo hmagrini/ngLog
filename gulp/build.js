@@ -14,7 +14,7 @@ module.exports = function(options) {
   gulp.task('ngLog', function(){
     return gulp.src([
       options.src + '/ngLog/ngLog.js',
-      options.src + '/ngLog/*.*.js'
+      options.src + '/ngLog/***.js'
     ])
       .pipe(concat('ngLog.js'))
       .pipe(gulp.dest(options.dist + '/ngLog'))
