@@ -1,5 +1,5 @@
 (function () {
-  "use strict";
+  'use strict';
   angular
     .module('ngLogModule')
     .provider('ngLog', NgLog);
@@ -87,14 +87,13 @@
         // in order to correctly identify the hierarchy tree
         if(this.context !== 'root'){
           hierarchyTree = _.union(this.context.split('.'), context.split('.'));
-          context = hierarchyTree.join('.');
         }else{
           hierarchyTree = context.split('.');
         }
-
         // We're going to navigate through the rest of the tree, and return when we found an instance of the requested
         // Logger. If along the tree, there is a branch that doesn't exist, it will be created automatically
-        _.each(hierarchyTree, function (child) {
+        _.each(hierarchyTree, function (child, index) {
+          context = _.take(hierarchyTree, index + 1).join('.');
           if(_.isUndefined(parent[child])){
             parent[child] = createLoggerInstance.call(parent.$root, context, isolate, parent);
           }
