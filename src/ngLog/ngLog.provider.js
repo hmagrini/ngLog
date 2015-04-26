@@ -54,53 +54,45 @@
         filterLogging   : filterLogging,
         muteLoggingBut  : muteLoggingBut,
         showHistory     : showHistory,
-        debug: function debugFn() {
-          this._log(Levels.DEBUG.toString(), arguments);
-        },
-        error: function errorFn() {
-          this._log(Levels.ERROR.toString(), arguments);
-        },
-        info: function infoFn() {
-          this._log(Levels.INFO.toString(), arguments);
-        },
-        log: function logFn() {
-          this._log(Levels.LOG.toString(), arguments);
-        },
-        warn: function warnFn() {
-          this._log(Levels.WARN.toString(), arguments);
-        }
+        debug           : logFnGetter(Levels.DEBUG),
+        error           : logFnGetter(Levels.ERROR),
+        info            : logFnGetter(Levels.INFO),
+        log             : logFnGetter(Levels.LOG),
+        warn            : logFnGetter(Levels.WARN)
       };
 
       return new Logger('root');
 
       /**
-       * Getter for a Logger instance, if no instance is found, a new one will be created
-       * @param context name of the instance that will define the logger and it's hierarchy tree
-       * @param isolate if true, it will create a new instance that will be it's own root logger
-       * @returns {Object} Logger instance
+       * We'll use this function to define our on log levels (console.log, info, etc...)
+       * @param originalFn name of the function that will be replaced
+       * @param args arguments received by the Logger
+       * @private
        */
-      function get(context, isolate) {
-        var parent = this.$root;
-        var hierarchyTree = [];
+      function _log(originalFn, args) {
 
-        // If the current context is different than the root, then we will union the current context and the one passed
-        // in order to correctly identify the hierarchy tree
-        if(this.context !== 'root'){
-          hierarchyTree = _.union(this.context.split('.'), context.split('.'));
-        }else{
-          hierarchyTree = context.split('.');
+        // When the history is enabled, will save the parameters that were used when a Logger was called
+        if (self.globalOptions.history.enable){
+          LH.history.push({originalFn: originalFn, args: args});
         }
-        // We're going to navigate through the rest of the tree, and return when we found an instance of the requested
-        // Logger. If along the tree, there is a branch that doesn't exist, it will be created automatically
-        _.each(hierarchyTree, function (child, index) {
-          context = _.take(hierarchyTree, index + 1).join('.');
-          if(_.isUndefined(parent[child])){
-            parent[child] = createLoggerInstance.call(parent.$root, context, isolate, parent);
-          }
-          parent = parent[child];
+
+        if (!isConsolable(originalFn, this)){
+          return;
+        }
+
+        var toLogArray = getFormattedContext.call(this);
+
+        // We'll append the args that the Logger should log to the entire message
+        _.each(args, function(arg){
+          toLogArray.push(arg);
         });
 
-        return parent;
+        // Prevent logging when console is not available
+        if (window.console) {
+          console[originalFn].apply(console, toLogArray);
+          showMetaInfo();
+        }
+
       }
 
       /**
@@ -135,37 +127,43 @@
         return child;
       }
 
+      /**
+       * Set the Logger level that will prevent Logger levels below to print into the console
+       * @param level
+       */
+      function filterLogging(level) {
+        this.options.filterFrom = level;
+      }
 
       /**
-       * We'll use this function to define our on log levels (console.log, info, etc...)
-       * @param originalFn name of the function that will be replaced
-       * @param args arguments received by the Logger
-       * @private
+       * Getter for a Logger instance, if no instance is found, a new one will be created
+       * @param context name of the instance that will define the logger and it's hierarchy tree
+       * @param isolate if true, it will create a new instance that will be it's own root logger
+       * @returns {Object} Logger instance
        */
-      function _log(originalFn, args) {
+      function get(context, isolate) {
+        var parent = this.$root;
+        var hierarchyTree = [];
 
-        // When the history is enabled, will save the parameters that were used when a Logger was called
-        if (self.globalOptions.history.enable){
-          LH.history.push({originalFn: originalFn, args: args});
+        // If the current context is different than the root, then we will union the current context and the one passed
+        // in order to correctly identify the hierarchy tree
+        if(this.context !== 'root'){
+          hierarchyTree = _.union(this.context.split('.'), context.split('.'));
+        }else{
+          hierarchyTree = context.split('.');
         }
-
-        if (!isConsolable(originalFn, this)){
-          return;
-        }
-
-        var toLogArray = getFormattedContext.call(this);
-
-        // We'll append the args that the Logger should log to the entire message
-        _.each(args, function(arg){
-          toLogArray.push(arg);
+        context = '';
+        // We're going to navigate through the rest of the tree, and return when we found an instance of the requested
+        // Logger. If along the tree, there is a branch that doesn't exist, it will be created automatically
+        _.each(hierarchyTree, function (child, index) {
+          context = _.take(hierarchyTree, index + 1).join('.');
+          if(_.isUndefined(parent[child])){
+            parent[child] = createLoggerInstance.call(parent.$root, context, isolate, parent);
+          }
+          parent = parent[child];
         });
 
-        // Prevent logging when console is not available
-        if (window.console) {
-          console[originalFn].apply(console, toLogArray);
-          showMetaInfo();
-        }
-
+        return parent;
       }
 
       /**
@@ -234,11 +232,14 @@
       }
 
       /**
-       * Set the Logger level that will prevent Logger levels below to print into the console
-       * @param level
+       * It will return a function that wraps the call to _log with the proper log Level
+       * @param logFnLevel
+       * @returns {Function}
        */
-      function filterLogging(level) {
-        this.options.filterFrom = level;
+      function logFnGetter(logFnLevel){
+        return function ngLogWrapperFn(){
+          this._log(logFnLevel.toString(), arguments);
+        }
       }
 
       /**
