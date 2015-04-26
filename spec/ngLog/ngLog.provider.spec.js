@@ -103,17 +103,15 @@
       describe('should be called ' + logFnLevel + 'and that', function (){
         checkDefinitionByType(logFnLevel, Function);
 
-        it('should invoke the function _log with the correct Logger Level as argument', specGenericLogFnCallArgs);
+        it('should invoke the function _log with the correct Logger Level as argument', function specGenericLogFnCallArgs(){
+          spyOn(Logger, '_log');
+          var logFnSpec = Logger.get('logFnSpec');
+          logFnSpec[logFnLevel]('some arguments');
+          expect(Logger._log.calls.argsFor(0)[0]).toEqual(logFnLevel);
+          expect(Logger._log.calls.argsFor(0)[1][0]).toEqual('some arguments');
+        });
 
       });
-    }
-
-    function specGenericLogFnCallArgs(){
-      spyOn(Logger, '_log');
-      var logFnSpec = Logger.get('logFnSpec');
-      logFnSpec[logFnLevel]('some arguments');
-      expect(Logger._log.calls.argsFor(0)[0]).toEqual(logFnLevel);
-      expect(Logger._log.calls.argsFor(0)[1][0]).toEqual('some arguments');
     }
 
     function specHierarchyCompleteMissing() {
