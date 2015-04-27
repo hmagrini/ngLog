@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Nglog by hermagrini</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Nglog</h1>
+      <h2 class="project-tagline"></h2>
+      <a href="https://github.com/hermagrini/ngLog" class="btn">View on GitHub</a>
+      <a href="https://github.com/hermagrini/ngLog/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/hermagrini/ngLog/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features:</h1>
+
+<ul>
+<li>Prevents logging when console is unavailable</li>
+<li>Creates a logging history for reviewing</li>
+<li>Context logging:
+
+<ul>
+<li>Each instance of the logger will be grouped by a defined context </li>
+<li>Each context will log with its own color to identify contexts more easily</li>
+</ul>
+</li>
+<li>
+<p>Muted Logs via filter:</p>
+
+<ul>
+<li>The property Options and Filters will be inherited by every child within a Logger</li>
+<li>ContextMute can be set via filterLogging(): this allows to set a ngLog.Level, which will mute all logging levels below than that Level.</li>
+<li>ContextMute can be also set by muteLoggingBut(): this allows to set a ngLog.Level, which will mute all logging levels except the one provided.</li>
+</ul>
+</li>
+<li><p>Timestamp format can be configured through the LoggerProvider</p></li>
+</ul>
+
+<h1>
+<a id="sample-usage" class="anchor" href="#sample-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sample Usage:</h1>
+
+<p><strong>Logging</strong></p>
+
+<ul>
+<li>Step 1: Inject ngLogModule as a dependency </li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>  app.module(<span class="pl-s"><span class="pl-pds">'</span>mySampleModule<span class="pl-pds">'</span></span>,[<span class="pl-s"><span class="pl-pds">'</span>ngLogModule<span class="pl-pds">'</span></span>]);</pre></div>
+
+<ul>
+<li>Step 2: Inject ngLog provider to wherever you need a Logger</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>  app.module(<span class="pl-s"><span class="pl-pds">'</span>mySampleModule<span class="pl-pds">'</span></span>)
+     .controller(<span class="pl-s"><span class="pl-pds">'</span>sampleController<span class="pl-pds">'</span></span>, [<span class="pl-s"><span class="pl-pds">'</span>ngLog<span class="pl-pds">'</span></span>, <span class="pl-k">function</span>(<span class="pl-smi">ngLog</span>){
+       <span class="pl-c">// controller implementation</span>
+     }]);</pre></div>
+
+<ul>
+<li>Step 3: create a new instance of the logger with the desired context name</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>  <span class="pl-k">var</span> firstLogger <span class="pl-k">=</span> ngLog.get(<span class="pl-s"><span class="pl-pds">'</span>firstLogger<span class="pl-pds">'</span></span>);
+  firstLogger<span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">'</span>Log example<span class="pl-pds">'</span></span>); <span class="pl-c">// Will output: 'Log example'</span></pre></div>
+
+<p><strong>Logger hierarchy and filter/mute inheritance</strong></p>
+
+<ul>
+<li>You can get a new Logger instance from the injected service:</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>  <span class="pl-k">var</span> firstLogger <span class="pl-k">=</span> ngLog.get(<span class="pl-s"><span class="pl-pds">'</span>firstLogger<span class="pl-pds">'</span></span>);
+  firstLogger.filterLogging(ngLog.Levels.DEBUG);
+  firstLogger<span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">'</span>Log example<span class="pl-pds">'</span></span>); <span class="pl-c">// Won't output anything</span></pre></div>
+
+<ul>
+<li>You can also have a nested Logger that will inherit the parents mute/filter options:</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>  <span class="pl-k">var</span> firstLogger <span class="pl-k">=</span> ngLog.get(<span class="pl-s"><span class="pl-pds">'</span>firstLogger<span class="pl-pds">'</span></span>);
+  firstLogger.filterLogging(ngLog.Levels.DEBUG);
+  <span class="pl-k">var</span> firstLoggerChild <span class="pl-k">=</span> ngLog.get(<span class="pl-s"><span class="pl-pds">'</span>firstLogger.firstChild<span class="pl-pds">'</span></span>);
+  firstLogger<span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">'</span>Log example<span class="pl-pds">'</span></span>); <span class="pl-c">// Won't output anything</span>
+  firstLoggerChild<span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">'</span>Log example<span class="pl-pds">'</span></span>); <span class="pl-c">// Won't output anything</span>
+  firstLoggerChild.debug(<span class="pl-s"><span class="pl-pds">'</span>Another log example<span class="pl-pds">'</span></span>) <span class="pl-c">// Will output: 'Another log example'</span></pre></div>
+
+<ul>
+<li>Or you could just create the child Logger from the parent:</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>  <span class="pl-k">var</span> firstLogger <span class="pl-k">=</span> ngLog.get(<span class="pl-s"><span class="pl-pds">'</span>firstLogger<span class="pl-pds">'</span></span>);
+  firstLogger.filterLogging(ngLog.Levels.DEBUG);
+  <span class="pl-k">var</span> firstLoggerChild <span class="pl-k">=</span> firstLogger.get(<span class="pl-s"><span class="pl-pds">'</span>firstChild<span class="pl-pds">'</span></span>);
+  firstLogger<span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">'</span>Log example<span class="pl-pds">'</span></span>); <span class="pl-c">// Won't output anything</span>
+  firstLoggerChild<span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">'</span>Log example<span class="pl-pds">'</span></span>); <span class="pl-c">// Won't output anything</span>
+  firstLoggerChild.debug(<span class="pl-s"><span class="pl-pds">'</span>Another log example<span class="pl-pds">'</span></span>) <span class="pl-c">// Will output: 'Another log example'</span></pre></div>
+
+<ul>
+<li>If there is a branch in the hierarchy missing, it will be automatically created:</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>  <span class="pl-k">var</span> firstLogger <span class="pl-k">=</span> ngLog.get(<span class="pl-s"><span class="pl-pds">'</span>firstLogger<span class="pl-pds">'</span></span>);
+  firstLogger.filterLogging(ngLog.Levels.DEBUG);
+  <span class="pl-k">var</span> firstLoggerGrandChild <span class="pl-k">=</span> ngLog.get(<span class="pl-s"><span class="pl-pds">'</span>firstLogger.firstChild.firtGrandChild<span class="pl-pds">'</span></span>);
+  firstLogger<span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">'</span>Log example<span class="pl-pds">'</span></span>); <span class="pl-c">// Won't output anything</span>
+  firstLoggerGrandChild<span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">'</span>Log example<span class="pl-pds">'</span></span>); <span class="pl-c">// Won't output anything</span>
+  firstLoggerGrandChild<span class="pl-c1">.info</span>(firstLoggerGrandChild.$parent.context) <span class="pl-c">// Will output: 'firstLogger.firstChild'</span></pre></div>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/hermagrini/ngLog">Nglog</a> is maintained by <a href="https://github.com/hermagrini">hermagrini</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
+
